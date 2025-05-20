@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chemistry Past Paper Search</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #eef2f3, #8e9eab);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      background-color: #2a7de1;
+      color: white;
+      padding: 20px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    h1 {
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .search-box input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+    .result-list {
+      margin-top: 20px;
+      list-style: none;
+      padding: 0;
+    }
+    .result-list li {
+      margin-bottom: 15px;
+      padding: 12px 16px;
+      border-left: 5px solid #2a7de1;
+      background-color: #f9f9f9;
+      border-radius: 6px;
+      transition: background 0.3s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .result-list li:hover {
+      background: #e4edfb;
+    }
+    .result-list a {
+      text-decoration: none;
+      color: #2a7de1;
+      font-weight: bold;
+    }
+    .btn-download {
+      background-color: #2a7de1;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-download:hover {
+      background-color: #195bbf;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><i class="fas fa-flask"></i> Chemistry Past Paper Search</h1>
+  </header>
+
+  <div class="container">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search by course, year, or keyword..." oninput="searchFiles()">
+    </div>
+    <ul id="results" class="result-list"></ul>
+  </div>
+
+  <script>
+    const API_KEY = "AIzaSyB2Wtg77YjAWFituiLDuuTeC2Lm04IgShs";
+    const ROOT_FOLDER_ID = "18euyXUXsVx5vU2609tj63WYt8J9JyzKk";
+
+    let allFiles = [];
+
+    async function fetchSubfolders(folderId) {
+      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType='application/vnd.google-apps.folder'&key=${API_KEY}&fields=files(id,name)`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return data.files || [];
+    }
+
+    async function fetchFilesFromFolder(folderId) {
+      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType!='application/vnd.google-apps.folder'&key=${API_KEY}&fields=files(id,name)`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return data.files || [];
+    }
+
+    async function loadAllFiles() {
+      try {
+        let subfolders = await fetchSubfolders(ROOT_FOLDER_ID);
+        let promises = subfolders.map(folder => fetchFilesFromFolder(folder.id));
+        const nestedFiles = await Promise.all(promises);
+        allFiles = nestedFiles.flat();
+        displayFiles(allFiles);
+      } catch (error) {
+        console.error("Error fetching files:", error);
+      }
+    }
+
+    function displayFiles(fileList) {
+      const resultList = document.getElementById("results");
+      resultList.innerHTML = "";
+
+      if (fileList.length === 0) {
+        resultList.innerHTML = "<li>No matching past papers found.</li>";
+        return;
+      }
+
+      fileList.forEach(file => {
+        const li = document.createElement("li");
+        const viewLink = `https://drive.google.com/file/d/${file.id}/view`;
+        const downloadLink = `https://drive.google.com/uc?export=download&id=${file.id}`;
+        li.innerHTML = `
+          <span><a href="${viewLink}" target="_blank">${file.name}</a></span>
+          <button class="btn-download" onclick="window.open('${downloadLink}', '_blank')">Download</button>
+        `;
+        resultList.appendChild(li);
+      });
+    }
+
+    function searchFiles() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = allFiles.filter(file => file.name.toLowerCase().includes(query));
+      displayFiles(filtered);
+    }
+
+    window.onload = loadAllFiles;
+  </script>
+</body>
+</html>
