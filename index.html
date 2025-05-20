@@ -142,7 +142,11 @@
 
   <script>
     const API_KEY = "AIzaSyB2Wtg77YjAWFituiLDuuTeC2Lm04IgShs";
-    const ROOT_FOLDER_ID = "18euyXUXsVx5vU2609tj63WYt8J9JyzKk";
+    const ROOT_FOLDER_IDS = [
+      "18euyXUXsVx5vU2609tj63WYt8J9JyzKk",
+      "1waMisS7bmBdpH8STn8oYcFj_vsiLQ-QS",
+      "1aWWPidiNZRy1CsjM7v1TT8Wn2Xqerqrl"
+    ];
 
     let allFiles = [];
 
@@ -162,14 +166,21 @@
 
     async function loadAllFiles() {
       document.getElementById("loader").style.display = "block";
+      let all = [];
+
       try {
-        let subfolders = await fetchSubfolders(ROOT_FOLDER_ID);
-        let promises = subfolders.map(folder => fetchFilesFromFolder(folder.id));
-        const nestedFiles = await Promise.all(promises);
-        allFiles = nestedFiles.flat();
+        for (const folderId of ROOT_FOLDER_IDS) {
+          let subfolders = await fetchSubfolders(folderId);
+          let folderFilePromises = subfolders.map(folder => fetchFilesFromFolder(folder.id));
+          let nestedFiles = await Promise.all(folderFilePromises);
+          let directFiles = await fetchFilesFromFolder(folderId);
+          all.push(...nestedFiles.flat(), ...directFiles);
+        }
+        allFiles = all;
       } catch (error) {
         console.error("Error fetching files:", error);
       }
+
       document.getElementById("loader").style.display = "none";
     }
 
