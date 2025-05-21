@@ -189,9 +189,9 @@
   </div>
 
   <!-- Ad Popup Structure -->
-  <div id="adPopup" class="ad-overlay" style="display: none;">
+  <div id="adPopup" class="ad-overlay">
     <div class="ad-container">
-      <img class="ad-image" src="./ad-banner.jpeg" alt="Advertisement" id="adImage">
+      <img class="ad-image" src="./ad-banner.jpeg" alt="Advertisement" id="adImage" onerror="this.src='./ad-banner.jpg'">
       <button class="close-btn" onclick="closeAd()">✕</button>
     </div>
   </div>
@@ -276,25 +276,30 @@
 
     // Ad popup functions
     function showAd() {
-      // Check if ad image exists/loads
-      const adImage = document.getElementById('adImage');
-      adImage.onerror = function() {
-        console.error("Advertisement image could not be loaded");
-        document.getElementById('adPopup').style.display = 'none';
-      };
-      adImage.onload = function() {
-        document.getElementById('adPopup').style.display = 'flex';
-      };
+      // Show the ad regardless of image loading status
+      document.getElementById('adPopup').style.display = 'flex';
+      console.log("Ad popup should be displayed now");
     }
 
     function closeAd() {
       document.getElementById('adPopup').style.display = 'none';
+      console.log("Ad popup closed");
     }
 
+    // Use both DOMContentLoaded and window.onload for better reliability
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("DOM loaded, will show ad soon");
+      // Show ad popup immediately to ensure it appears
+      setTimeout(showAd, 1000);
+    });
+
     window.onload = function() {
+      console.log("Window loaded completely");
       loadAllFiles();
-      // Show ad popup with slight delay for better user experience
-      setTimeout(showAd, 500);
+      // Make sure ad is showing
+      if (document.getElementById('adPopup').style.display !== 'flex') {
+        showAd();
+      }
     };
   </script>
 </body>
