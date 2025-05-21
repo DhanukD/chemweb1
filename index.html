@@ -124,6 +124,54 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* Ad Popup Styles */
+    .ad-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .ad-container {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+    }
+    .ad-image {
+      width: 300px;
+      height: 300px;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .close-btn {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      width: 30px;
+      height: 30px;
+      background-color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      color: #333;
+      font-size: 16px;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    .close-btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.1);
+    }
   </style>
 </head>
 <body>
@@ -138,6 +186,14 @@
     </div>
     <div id="loader"><div class="spinner"></div></div>
     <ul id="results" class="result-list"></ul>
+  </div>
+
+  <!-- Ad Popup Structure -->
+  <div id="adPopup" class="ad-overlay" style="display: none;">
+    <div class="ad-container">
+      <img class="ad-image" src="./ad-banner.jpeg" alt="Advertisement" id="adImage">
+      <button class="close-btn" onclick="closeAd()">✕</button>
+    </div>
   </div>
 
   <script>
@@ -218,7 +274,28 @@
       displayFiles(filtered);
     }
 
-    window.onload = loadAllFiles;
+    // Ad popup functions
+    function showAd() {
+      // Check if ad image exists/loads
+      const adImage = document.getElementById('adImage');
+      adImage.onerror = function() {
+        console.error("Advertisement image could not be loaded");
+        document.getElementById('adPopup').style.display = 'none';
+      };
+      adImage.onload = function() {
+        document.getElementById('adPopup').style.display = 'flex';
+      };
+    }
+
+    function closeAd() {
+      document.getElementById('adPopup').style.display = 'none';
+    }
+
+    window.onload = function() {
+      loadAllFiles();
+      // Show ad popup with slight delay for better user experience
+      setTimeout(showAd, 500);
+    };
   </script>
 </body>
 </html>
