@@ -15,125 +15,224 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     :root {
+      /* Light mode variables */
       --primary-color: #800000;
       --accent-color: #b22222;
-      --bg-gradient: linear-gradient(135deg, #f8ecec, #fff9f9);
-      --box-bg: #ffffff;
-      --text-color: #1f1f1f;
-      --muted-text: #555;
+      --bg-color: #f8f8f8;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+      --muted-text: #666666;
+      --border-color: #eeeeee;
+      --input-bg: #ffffff;
+      --input-border: #e0e0e0;
+      --result-bg: #f5f5f5;
+      --shadow: 0 4px 12px rgba(0,0,0,0.05);
+      --header-gradient: linear-gradient(90deg, #800000, #a51c1c);
     }
+
+    /* Dark mode color scheme */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary-color: #b22222;
+        --accent-color: #c53030;
+        --bg-color: #121212;
+        --card-bg: #1e1e1e;
+        --text-color: #e0e0e0;
+        --muted-text: #aaaaaa;
+        --border-color: #333333;
+        --input-bg: #2a2a2a;
+        --input-border: #444444;
+        --result-bg: #252525;
+        --shadow: 0 4px 12px rgba(0,0,0,0.3);
+        --header-gradient: linear-gradient(90deg, #600000, #901010);
+      }
+    }
+
     * {
       box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg-gradient);
       margin: 0;
       padding: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-color);
       color: var(--text-color);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
     }
+
     header {
-      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-      color: white;
-      padding: 40px 20px 30px;
-      width: 100%;
+      background: var(--header-gradient);
+      padding: 24px 16px;
       text-align: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow);
     }
-    h1.site-title {
-      font-family: 'Times New Roman', Times, serif;
-      font-size: 42px;
-      margin: 0;
+
+    .site-title {
+      font-family: 'Georgia', serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
     }
-    h2.sub-title {
+
+    .sub-title {
       font-weight: 400;
-      margin-top: 10px;
-      font-size: 20px;
-      color: #fce7e7;
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+
     .container {
-      max-width: 700px;
-      width: 90%;
-      margin: 40px auto;
-      background: var(--box-bg);
-      padding: 35px;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-      position: relative;
+      max-width: 800px;
+      width: 92%;
+      margin: 32px auto;
+      padding: 30px;
+      border-radius: 12px;
+      background-color: var(--card-bg);
+      box-shadow: var(--shadow);
     }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
     .search-box input {
       width: 100%;
-      padding: 14px;
+      padding: 16px 16px 16px 48px;
       font-size: 16px;
-      border: 1.5px solid #ddd;
-      border-radius: 10px;
-      transition: border-color 0.3s ease;
+      border: 1px solid var(--input-border);
+      border-radius: 24px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
+
     .search-box input:focus {
       outline: none;
       border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(178, 34, 34, 0.15);
     }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted-text);
+    }
+
     .result-list {
-      margin-top: 25px;
-      padding: 0;
+      margin-top: 16px;
       list-style: none;
     }
+
     .result-list li {
-      background: #fafafa;
-      margin-bottom: 15px;
-      padding: 16px 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      background: var(--result-bg);
+      margin-bottom: 12px;
+      padding: 16px;
+      border-radius: 8px;
       display: flex;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
       align-items: center;
+      transition: transform 0.2s;
     }
-    .result-list a {
-      font-weight: 600;
-      color: var(--primary-color);
+
+    .result-list li:hover {
+      transform: translateY(-2px);
+    }
+
+    .file-name {
+      font-weight: 500;
+      color: var(--text-color);
       text-decoration: none;
       word-break: break-word;
+      margin-right: 12px;
     }
-    .btn-download, .btn-preview {
-      background-color: var(--accent-color);
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
+
+    .file-name:hover {
+      color: var(--primary-color);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      background-color: transparent;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
       font-size: 14px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.2s;
+      gap: 6px;
     }
-    .btn-download:hover, .btn-preview:hover {
+
+    .btn-preview {
+      background-color: transparent;
+    }
+
+    .btn-download {
       background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
     }
-    #loader {
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-preview:hover {
+      background-color: var(--result-bg);
+    }
+
+    .btn-download:hover {
+      background-color: var(--accent-color);
+    }
+
+    .loader {
       display: none;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
     }
+
     .spinner {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid var(--primary-color);
+      border: 3px solid rgba(178, 34, 34, 0.1);
+      border-top: 3px solid var(--primary-color);
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
+      width: 36px;
+      height: 36px;
       animation: spin 1s linear infinite;
     }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    /* Ad Popup Styles */
+    .no-results {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted-text);
+    }
+
     .ad-overlay {
       position: fixed;
       top: 0;
@@ -145,40 +244,81 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      backdrop-filter: blur(4px);
     }
+
     .ad-container {
       position: relative;
       max-width: 90%;
       max-height: 90%;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: var(--card-bg);
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
+
     .ad-image {
-      width: 300px;
-      height: 300px;
+      width: 320px;
+      height: 320px;
       object-fit: contain;
       border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
+
     .close-btn {
       position: absolute;
-      top: -15px;
-      right: -15px;
-      width: 30px;
-      height: 30px;
-      background-color: white;
+      top: -12px;
+      right: -12px;
+      width: 28px;
+      height: 28px;
+      background-color: var(--primary-color);
+      color: white;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-      color: #333;
-      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      font-size: 14px;
       border: none;
       transition: all 0.2s ease;
     }
+
     .close-btn:hover {
-      background-color: #f0f0f0;
+      background-color: var(--accent-color);
       transform: scale(1.1);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+        width: 95%;
+      }
+
+      .result-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .btn {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted-text);
     }
   </style>
 </head>
@@ -190,9 +330,10 @@
 
   <div class="container">
     <div class="search-box">
+      <i class="fas fa-search search-icon"></i>
       <input type="text" id="searchInput" placeholder="Search by course, year, or keyword..." oninput="searchFiles()">
     </div>
-    <div id="loader"><div class="spinner"></div></div>
+    <div id="loader" class="loader"><div class="spinner"></div></div>
     <ul id="results" class="result-list"></ul>
   </div>
 
@@ -203,6 +344,10 @@
       <button class="close-btn" onclick="closeAd()">✕</button>
     </div>
   </div>
+
+  <footer>
+    © 2025 CHEMweb | CCS Past Paper Search Engine
+  </footer>
 
   <script>
     const API_KEY = "AIzaSyB2Wtg77YjAWFituiLDuuTeC2Lm04IgShs";
@@ -263,7 +408,7 @@
       resultList.innerHTML = "";
 
       if (fileList.length === 0) {
-        resultList.innerHTML = "<li>No matching past papers found.</li>";
+        resultList.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><p>No matching past papers found.</p></div>';
         return;
       }
 
@@ -271,11 +416,16 @@
         const li = document.createElement("li");
         const viewLink = `https://drive.google.com/file/d/${file.id}/view`;
         const downloadLink = `https://drive.google.com/uc?export=download&id=${file.id}`;
+        
         li.innerHTML = `
-          <span><a href="${viewLink}" target="_blank">${file.name}</a></span>
-          <div>
-            <button class="btn-preview" onclick="window.open('${viewLink}', '_blank'); trackAction('preview', '${file.name}')">Preview</button>
-            <button class="btn-download" onclick="window.open('${downloadLink}', '_blank'); trackAction('download', '${file.name}')">Download</button>
+          <a href="${viewLink}" target="_blank" class="file-name">${file.name}</a>
+          <div class="buttons">
+            <button class="btn btn-preview" onclick="window.open('${viewLink}', '_blank'); trackAction('preview', '${file.name}')">
+              <i class="fas fa-eye"></i> Preview
+            </button>
+            <button class="btn btn-download" onclick="window.open('${downloadLink}', '_blank'); trackAction('download', '${file.name}')">
+              <i class="fas fa-download"></i> Download
+            </button>
           </div>
         `;
         resultList.appendChild(li);
@@ -294,7 +444,6 @@
 
     // Ad popup functions
     function showAd() {
-      // Show the ad regardless of image loading status
       document.getElementById('adPopup').style.display = 'flex';
       console.log("Ad popup displayed");
       // Track ad impression
@@ -312,17 +461,31 @@
       }
     }
 
-    // Use both DOMContentLoaded and window.onload for better reliability
+    // Detect dark mode preference
+    function detectColorScheme() {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        console.log("Dark mode detected");
+        // Track dark mode usage
+        if (typeof gtag === 'function') {
+          gtag('event', 'dark_mode_used');
+        }
+      } else {
+        console.log("Light mode detected");
+      }
+    }
+
+    // Event listener for dark mode changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', detectColorScheme);
+
     document.addEventListener('DOMContentLoaded', function() {
-      console.log("DOM loaded, will show ad soon");
-      // Show ad popup immediately to ensure it appears
+      console.log("DOM loaded");
+      detectColorScheme();
       setTimeout(showAd, 1000);
     });
 
     window.onload = function() {
       console.log("Window loaded completely");
       loadAllFiles();
-      // Make sure ad is showing
       if (document.getElementById('adPopup').style.display !== 'flex') {
         showAd();
       }
