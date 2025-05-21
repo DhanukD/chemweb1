@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CHEMweb | CCS Past Paper Search Engine</title>
+  <!-- Google Analytics 4 Tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-T05PTNYGGQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-T05PTNYGGQ');
+  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     :root {
@@ -240,6 +248,16 @@
       document.getElementById("loader").style.display = "none";
     }
 
+    // Track when a user downloads or previews a file
+    function trackAction(action, fileName) {
+      if (typeof gtag === 'function') {
+        gtag('event', action, {
+          'file_name': fileName
+        });
+        console.log(`Tracked ${action}: ${fileName}`);
+      }
+    }
+
     function displayFiles(fileList) {
       const resultList = document.getElementById("results");
       resultList.innerHTML = "";
@@ -256,8 +274,8 @@
         li.innerHTML = `
           <span><a href="${viewLink}" target="_blank">${file.name}</a></span>
           <div>
-            <button class="btn-preview" onclick="window.open('${viewLink}', '_blank')">Preview</button>
-            <button class="btn-download" onclick="window.open('${downloadLink}', '_blank')">Download</button>
+            <button class="btn-preview" onclick="window.open('${viewLink}', '_blank'); trackAction('preview', '${file.name}')">Preview</button>
+            <button class="btn-download" onclick="window.open('${downloadLink}', '_blank'); trackAction('download', '${file.name}')">Download</button>
           </div>
         `;
         resultList.appendChild(li);
@@ -278,12 +296,20 @@
     function showAd() {
       // Show the ad regardless of image loading status
       document.getElementById('adPopup').style.display = 'flex';
-      console.log("Ad popup should be displayed now");
+      console.log("Ad popup displayed");
+      // Track ad impression
+      if (typeof gtag === 'function') {
+        gtag('event', 'ad_impression');
+      }
     }
 
     function closeAd() {
       document.getElementById('adPopup').style.display = 'none';
       console.log("Ad popup closed");
+      // Track ad closed
+      if (typeof gtag === 'function') {
+        gtag('event', 'ad_closed');
+      }
     }
 
     // Use both DOMContentLoaded and window.onload for better reliability
