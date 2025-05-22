@@ -136,14 +136,16 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      gap: 12px;
     }
 
     .file-name {
       font-weight: 500;
       color: var(--text-color);
       word-break: break-word;
-      margin-right: 12px;
       text-decoration: none;
+      flex: 1;
+      min-width: 0;
     }
 
     .file-name:hover {
@@ -168,6 +170,8 @@
       border-radius: 6px;
       cursor: pointer;
       gap: 6px;
+      text-decoration: none;
+      white-space: nowrap;
     }
 
     .btn-preview:hover {
@@ -177,6 +181,7 @@
     .btn-download {
       background-color: var(--primary-color);
       color: white;
+      border-color: var(--primary-color);
     }
 
     .btn-download:hover {
@@ -227,8 +232,10 @@
       position: relative;
       background-color: var(--card-bg);
       border-radius: 12px;
-      padding: 16px;
+      padding: 24px;
       max-width: 90%;
+      max-height: 90%;
+      overflow: hidden;
     }
 
     .ad-image {
@@ -240,10 +247,10 @@
 
     .close-btn {
       position: absolute;
-      top: -12px;
-      right: -12px;
-      width: 28px;
-      height: 28px;
+      top: 8px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
       background-color: var(--primary-color);
       color: white;
       border-radius: 50%;
@@ -251,7 +258,9 @@
       justify-content: center;
       align-items: center;
       border: none;
-      font-size: 14px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     .close-btn:hover {
@@ -265,6 +274,64 @@
       text-align: center;
       font-size: 14px;
       color: var(--muted-text);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .site-title {
+        font-size: 28px;
+      }
+
+      .sub-title {
+        font-size: 14px;
+      }
+
+      .container {
+        width: 95%;
+        padding: 20px;
+        margin: 16px auto;
+      }
+
+      .result-list li {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+
+      .file-name {
+        margin-bottom: 8px;
+      }
+
+      .buttons {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+      }
+
+      .ad-container {
+        margin: 20px;
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .search-box input {
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
     }
   </style>
 </head>
@@ -285,8 +352,8 @@
 
   <div id="adPopup" class="ad-overlay">
     <div class="ad-container">
-      <img class="ad-image" src="./ad-banner.jpeg" alt="Advertisement" onerror="this.src='./ad-banner.jpg'">
       <button class="close-btn" onclick="closeAd()">&times;</button>
+      <img class="ad-image" src="./ad-banner.jpeg" alt="Advertisement" onerror="this.src='./ad-banner.jpg'">
     </div>
   </div>
 
@@ -304,18 +371,38 @@
 
     let allFiles = [];
 
+    // Google Analytics tracking function
+    function trackAction(action, fileName) {
+      if (typeof gtag !== 'undefined') {
+        gtag('event', action, {
+          'event_category': 'file_interaction',
+          'event_label': fileName
+        });
+      }
+    }
+
     async function fetchSubfolders(folderId) {
-      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType='application/vnd.google-apps.folder'&key=${API_KEY}&fields=files(id,name)`;
-      const res = await fetch(url);
-      const data = await res.json();
-      return data.files || [];
+      try {
+        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType='application/vnd.google-apps.folder'&key=${API_KEY}&fields=files(id,name)`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.files || [];
+      } catch (error) {
+        console.error("Error fetching subfolders:", error);
+        return [];
+      }
     }
 
     async function fetchFilesFromFolder(folderId) {
-      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType!='application/vnd.google-apps.folder'&key=${API_KEY}&fields=files(id,name)`;
-      const res = await fetch(url);
-      const data = await res.json();
-      return data.files || [];
+      try {
+        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType!='application/vnd.google-apps.folder'&key=${API_KEY}&fields=files(id,name)`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.files || [];
+      } catch (error) {
+        console.error("Error fetching files:", error);
+        return [];
+      }
     }
 
     async function loadAllFiles() {
@@ -331,6 +418,7 @@
           all.push(...nestedFiles.flat(), ...directFiles);
         }
         allFiles = all;
+        console.log(`Loaded ${allFiles.length} files`);
       } catch (error) {
         console.error("Error fetching files:", error);
       }
@@ -339,13 +427,28 @@
     }
 
     function searchFiles() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
+      const query = document.getElementById("searchInput").value.toLowerCase().trim();
       if (!query || query.length < 2) {
         document.getElementById("results").innerHTML = "";
         return;
       }
       const filtered = allFiles.filter(file => file.name.toLowerCase().includes(query));
       displayFiles(filtered);
+    }
+
+    function downloadFile(fileId, fileName) {
+      // Create a temporary link element
+      const link = document.createElement('a');
+      link.href = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      link.download = fileName; // Suggest filename
+      
+      // Trigger download without opening new tab
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Track the download
+      trackAction('download', fileName);
     }
 
     function displayFiles(fileList) {
@@ -360,15 +463,15 @@
       fileList.forEach(file => {
         const li = document.createElement("li");
         const viewLink = `https://drive.google.com/file/d/${file.id}/view`;
-        const downloadLink = `https://drive.google.com/uc?export=download&id=${file.id}`;
+        const safeFileName = file.name.replace(/'/g, "\\'").replace(/"/g, '\\"');
 
         li.innerHTML = `
           <a href="${viewLink}" target="_blank" class="file-name">${file.name}</a>
           <div class="buttons">
-            <button class="btn btn-preview" onclick="window.open('${viewLink}', '_blank'); trackAction('preview', '${file.name}')">
+            <a href="${viewLink}" target="_blank" class="btn btn-preview" onclick="trackAction('preview', '${safeFileName}')">
               <i class="fas fa-eye"></i> Preview
-            </button>
-            <button class="btn btn-download" onclick="window.open('${downloadLink}', '_blank'); trackAction('download', '${file.name}')">
+            </a>
+            <button class="btn btn-download" onclick="downloadFile('${file.id}', '${safeFileName}')">
               <i class="fas fa-download"></i> Download
             </button>
           </div>
@@ -377,21 +480,46 @@
       });
     }
 
-    function closeAd() {
-      document.getElementById("adPopup").style.display = "none";
-    }
-
     function showAd() {
-      document.getElementById("adPopup").style.display = "flex";
+      const adPopup = document.getElementById("adPopup");
+      if (adPopup) {
+        adPopup.style.display = "flex";
+        console.log("Ad popup shown");
+      } else {
+        console.error("Ad popup element not found");
+      }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      setTimeout(showAd, 1000);
+    function closeAd() {
+      const adPopup = document.getElementById("adPopup");
+      if (adPopup) {
+        adPopup.style.display = "none";
+        console.log("Ad popup closed");
+      }
+    }
+
+    // Close ad when clicking outside of it
+    document.getElementById("adPopup").addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAd();
+      }
     });
 
-    window.onload = function () {
+    // Close ad with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAd();
+      }
+    });
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      // Show ad after 2 seconds
+      setTimeout(showAd, 2000);
+      
+      // Load files
       loadAllFiles();
-    };
+    });
   </script>
 </body>
 </html>
