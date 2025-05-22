@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     :root {
-      /* Light mode variables */
       --primary-color: #800000;
       --accent-color: #b22222;
       --bg-color: #f8f8f8;
@@ -30,7 +29,6 @@
       --header-gradient: linear-gradient(90deg, #800000, #a51c1c);
     }
 
-    /* Dark mode color scheme */
     @media (prefers-color-scheme: dark) {
       :root {
         --primary-color: #b22222;
@@ -56,12 +54,12 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', sans-serif;
       background-color: var(--bg-color);
       color: var(--text-color);
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
     }
 
     header {
@@ -81,12 +79,11 @@
     }
 
     .sub-title {
-      font-weight: 400;
       font-size: 16px;
       color: rgba(255, 255, 255, 0.85);
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       gap: 8px;
     }
 
@@ -113,14 +110,7 @@
       border-radius: 24px;
       background-color: var(--input-bg);
       color: var(--text-color);
-      transition: all 0.3s ease;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    .search-box input:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(178, 34, 34, 0.15);
     }
 
     .search-icon {
@@ -132,8 +122,9 @@
     }
 
     .result-list {
-      margin-top: 16px;
       list-style: none;
+      padding: 0;
+      margin-top: 16px;
     }
 
     .result-list li {
@@ -144,19 +135,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: transform 0.2s;
-    }
-
-    .result-list li:hover {
-      transform: translateY(-2px);
+      flex-wrap: wrap;
     }
 
     .file-name {
       font-weight: 500;
       color: var(--text-color);
-      text-decoration: none;
       word-break: break-word;
       margin-right: 12px;
+      text-decoration: none;
     }
 
     .file-name:hover {
@@ -172,6 +159,7 @@
     .btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       background-color: transparent;
       color: var(--text-color);
       border: 1px solid var(--border-color);
@@ -179,26 +167,16 @@
       font-size: 14px;
       border-radius: 6px;
       cursor: pointer;
-      transition: all 0.2s;
       gap: 6px;
     }
 
-    .btn-preview {
-      background-color: transparent;
+    .btn-preview:hover {
+      background-color: var(--result-bg);
     }
 
     .btn-download {
       background-color: var(--primary-color);
       color: white;
-      border-color: var(--primary-color);
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .btn-preview:hover {
-      background-color: var(--result-bg);
     }
 
     .btn-download:hover {
@@ -207,10 +185,8 @@
 
     .loader {
       display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      justify-content: center;
+      align-items: center;
     }
 
     .spinner {
@@ -234,13 +210,13 @@
     }
 
     .ad-overlay {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
@@ -249,20 +225,17 @@
 
     .ad-container {
       position: relative;
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 12px;
-      overflow: hidden;
       background-color: var(--card-bg);
+      border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      max-width: 90%;
     }
 
     .ad-image {
-      width: 320px;
-      height: 320px;
-      object-fit: contain;
+      width: 100%;
+      max-width: 320px;
       border-radius: 8px;
+      object-fit: contain;
     }
 
     .close-btn {
@@ -277,40 +250,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      font-size: 14px;
       border: none;
-      transition: all 0.2s ease;
+      font-size: 14px;
     }
 
     .close-btn:hover {
       background-color: var(--accent-color);
       transform: scale(1.1);
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 600px) {
-      .container {
-        padding: 20px;
-        width: 95%;
-      }
-
-      .result-list li {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .buttons {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .btn {
-        flex: 1;
-        justify-content: center;
-      }
     }
 
     footer {
@@ -337,11 +283,10 @@
     <ul id="results" class="result-list"></ul>
   </div>
 
-  <!-- Ad Popup Structure -->
   <div id="adPopup" class="ad-overlay">
     <div class="ad-container">
-      <img class="ad-image" src="./ad-banner.jpeg" alt="Advertisement" id="adImage" onerror="this.src='./ad-banner.jpg'">
-      <button class="close-btn" onclick="closeAd()">✕</button>
+      <img class="ad-image" src="./ad-banner.jpeg" alt="Advertisement" onerror="this.src='./ad-banner.jpg'">
+      <button class="close-btn" onclick="closeAd()">&times;</button>
     </div>
   </div>
 
@@ -374,7 +319,7 @@
     }
 
     async function loadAllFiles() {
-      document.getElementById("loader").style.display = "block";
+      document.getElementById("loader").style.display = "flex";
       let all = [];
 
       try {
@@ -393,14 +338,14 @@
       document.getElementById("loader").style.display = "none";
     }
 
-    // Track when a user downloads or previews a file
-    function trackAction(action, fileName) {
-      if (typeof gtag === 'function') {
-        gtag('event', action, {
-          'file_name': fileName
-        });
-        console.log(`Tracked ${action}: ${fileName}`);
+    function searchFiles() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      if (!query || query.length < 2) {
+        document.getElementById("results").innerHTML = "";
+        return;
       }
+      const filtered = allFiles.filter(file => file.name.toLowerCase().includes(query));
+      displayFiles(filtered);
     }
 
     function displayFiles(fileList) {
@@ -416,7 +361,7 @@
         const li = document.createElement("li");
         const viewLink = `https://drive.google.com/file/d/${file.id}/view`;
         const downloadLink = `https://drive.google.com/uc?export=download&id=${file.id}`;
-        
+
         li.innerHTML = `
           <a href="${viewLink}" target="_blank" class="file-name">${file.name}</a>
           <div class="buttons">
@@ -432,63 +377,20 @@
       });
     }
 
-    function searchFiles() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      if (!query || query.length < 2) {
-        document.getElementById("results").innerHTML = "";
-        return;
-      }
-      const filtered = allFiles.filter(file => file.name.toLowerCase().includes(query));
-      displayFiles(filtered);
-    }
-
-    // Ad popup functions
-    function showAd() {
-      document.getElementById('adPopup').style.display = 'flex';
-      console.log("Ad popup displayed");
-      // Track ad impression
-      if (typeof gtag === 'function') {
-        gtag('event', 'ad_impression');
-      }
-    }
-
     function closeAd() {
-      document.getElementById('adPopup').style.display = 'none';
-      console.log("Ad popup closed");
-      // Track ad closed
-      if (typeof gtag === 'function') {
-        gtag('event', 'ad_closed');
-      }
+      document.getElementById("adPopup").style.display = "none";
     }
 
-    // Detect dark mode preference
-    function detectColorScheme() {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        console.log("Dark mode detected");
-        // Track dark mode usage
-        if (typeof gtag === 'function') {
-          gtag('event', 'dark_mode_used');
-        }
-      } else {
-        console.log("Light mode detected");
-      }
+    function showAd() {
+      document.getElementById("adPopup").style.display = "flex";
     }
 
-    // Event listener for dark mode changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', detectColorScheme);
-
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log("DOM loaded");
-      detectColorScheme();
+    document.addEventListener('DOMContentLoaded', function () {
       setTimeout(showAd, 1000);
     });
 
-    window.onload = function() {
-      console.log("Window loaded completely");
+    window.onload = function () {
       loadAllFiles();
-      if (document.getElementById('adPopup').style.display !== 'flex') {
-        showAd();
-      }
     };
   </script>
 </body>
